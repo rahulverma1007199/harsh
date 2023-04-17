@@ -1,0 +1,26 @@
+span, .errorAPI{
+    font-size: 12px;
+    padding: 3px;
+    margin-top: -15px;
+    color: red;
+    display: none;
+}
+
+.button{
+    color: white;
+    background-color: rgb(39, 143, 211);;
+    padding: 9px 13px;
+}
+
+input:invalid~ .button{
+    cursor:not-allowed;
+    background-color: grey;
+}
+
+
+input:invalid[focusedpassword = "true"] ~ .passwordError{
+    display: block;
+}
+input:invalid[focusedemail = "true"] ~ .emailError{
+    display: block;
+}
