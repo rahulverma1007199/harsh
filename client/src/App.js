@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Button } from 'antd';
 import ChatDrawer from './component/chatDrawer';
+
 const App = () => {
 const [drawerVisible, setDrawerVisible] = useState(false);
 
