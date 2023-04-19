@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "../../../layout/Layout";
 import TabsLayout from "../../../layout/TabsLayout";
 import CampaignTable from "../campaign/CampaignTable";
@@ -48,8 +48,19 @@ const CampaignForm = () => {
   const uploadDocumentHandler = (event) => {
     hiddenFileInput.current.click();
   };
+  const [clientList, setClientList] = useState([])
+  useEffect(() => {
+    axios.get(`${URL}clientList`,
+      {
+        headers: { "Authorization": `Bearer ${token}` }
+      }).then(res => {
+        setClientList(res.data.Data)
+        // console.log(res)
+      }).catch(err => {
+        console.log(err)
 
-
+      })
+  }, [])
   const handleSubmit = (e) => {
     e.preventDefault();
     let formData = new FormData();    //formdata object
@@ -126,17 +137,7 @@ const CampaignForm = () => {
         <div className="md:w-1/3 flex flex-col gap-5">
           <div className="flex flex-col gap-5">
             Client
-            {/* <Autocomplete
-              disablePortal
-              id=""
-              // options={top100Films}
-              name="client_id"
-              // value={campaignFormData.client_id}
-              // onChange={(e) => handleChange(e)}
-              sx={{ width: 300 }}
-              renderInput={(params) => <TextField {...params} label="client" />}
-            /> */}
-            <input
+            {/* <input
               label="Client"
               className="border border-primaryBlack px-3 py-2 focus:border-primaryBlue outline-none w-full "
               type="text"
@@ -144,7 +145,11 @@ const CampaignForm = () => {
               name="client_id"
               value={campaignFormData.client_id}
               onChange={(e) => handleChange(e)}
-            />
+            /> */}
+            <select id="cars" name="client_id" className="border border-primaryBlack px-3 py-2 focus:border-primaryBlue outline-none w-full ">
+              {clientList && clientList.map((eachClient)=>
+              <option key={eachClient.id} value={eachClient.client_name}>{eachClient.client_name}</option>)}
+            </select>
             Campaign Title
             <input
               label="Campaign Title"
@@ -157,35 +162,7 @@ const CampaignForm = () => {
             />
           </div>
         </div>
-        <div>
-          <h2>Criteria</h2>
-        </div>
         <Grid container spacing={3} className='campaigns'>
-          <Grid item md={3}>
-            <div className="bg-primaryGra flex flex-col gap-5 w-full h-auto p-2 ">
-              <Grid item md={3} xs={8} >
-                Buget
-
-              </Grid>
-
-              <Typography >$300 </Typography>
-              <Typography >$400</Typography>
-
-              <Slider
-                className="flex flex-col"
-                sx={{ width: 250 }}
-                value={range}
-                
-                id="campaign-input-04"
-                getAriaLabel={() => "Minimum distance range"}
-                name="price"
-                onChange={(e) => changeCheckBoxState(e)}
-                valueLabelDisplay="auto"
-                getAriaValueText={valuetext}
-
-              />
-            </div>
-          </Grid>
 
           <div>
             <div style={{ width: "150px", maxHeight: "10px", paddingTop: '50px' }}>

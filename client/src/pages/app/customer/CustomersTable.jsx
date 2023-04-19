@@ -12,7 +12,8 @@ import { URL, CUSTOMERDELETEURL } from "../../../api/constants";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from "react-router-dom";
-import { PATHS } from "../../../routes/paths";
+import { Button } from 'antd';
+import ChatDrawer from "../../../components/ChatDrawer";
 
 export default function CustomersTable() {
   const [page, setPage] = React.useState(0);
@@ -62,6 +63,17 @@ export default function CustomersTable() {
   const editFun = (id) => {
     navigate("/admin/customer-details/" + id)
   }
+
+  const [drawerVisible, setDrawerVisible] = useState(false);
+
+  const showDrawer = () => {
+  setDrawerVisible(true);
+  };
+
+  const hideDrawer = () => {
+  setDrawerVisible(false);
+  };
+
   return (
     <>
 
@@ -78,11 +90,11 @@ export default function CustomersTable() {
                 <TableCell>S.No</TableCell>
                 <TableCell>Name</TableCell>
                 <TableCell>Mobile</TableCell>
-                <TableCell>No. of Cattles</TableCell>
                 <TableCell>Campaign</TableCell>
                 <TableCell>State</TableCell>
                 <TableCell>District</TableCell>
                 <TableCell>Tehsil</TableCell>
+                <TableCell>Chat</TableCell>
                 <TableCell>Action</TableCell>
 
               </TableRow>
@@ -93,11 +105,18 @@ export default function CustomersTable() {
                   <TableCell>{index + 1}</TableCell>
                   <TableCell>{item.first_name}</TableCell>
                   <TableCell>{item.mobile_number}</TableCell>
-                  <TableCell>{item.number_of_cattle_to_buy}</TableCell>
                   <TableCell>{item.campaign_customersref[0]?.campaignsref?.campaign_name}</TableCell>
                   <TableCell>{item.stateref?.name}</TableCell>
                   <TableCell>{item.districtref?.district}</TableCell>
                   <TableCell>{item.tehsilref?.tahshil}</TableCell>
+                  <TableCell>
+                    <div>
+                      <Button type="primary" onClick={showDrawer}>
+                        Open chat
+                      </Button>
+                      <ChatDrawer visible={drawerVisible} onClose={hideDrawer} />
+                    </div>
+                  </TableCell>
                   <TableCell>
                     <div><button><EditIcon onClick={() => editFun(item.id)} /> </button><button><DeleteIcon onClick={() => deleteFun(item.id)} /></button></div>
                   </TableCell>
