@@ -7,14 +7,6 @@ var cors = require('cors')
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/customers');
 var adminRouter = require('./routes/admin');
-
-
-var routes = require('./routes');
-var user = require('./routes/customers');
-var http = require('http');
-var bodyParser = require('body-parser');
-
-
 var app = express();
 
 // view engine setup
@@ -55,5 +47,7 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+
 
 module.exports = app;
