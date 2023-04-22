@@ -90,35 +90,97 @@ const dbb = mysql.createConnection({
       console.log('Connected to MySQL');
     });
 
-router.post("/sendMessage", async function (req,res){
-    const message = "hie";
-  
+    router.post("/sendMessage", async (req,res)=>{
+      const message = req.body.message_text;
+      const to = `91${req.body.to_number}`;
+      const conversation_id = req.body.conversation_id;
+      console.log(message,to,conversation_id);
       try {
-        const q = "SELECT * FROM customers";
+         // replace the values below from the values you copied above
+         const from = 108705542121394;
+         const token = 'EAAM5CTpl8JgBAOA7hVHMmcLbkIEdiRZAZCrLSJAWZB3HrZCEaWMZAxC8UZAB6ZA87kPS1XvR33XLRTX2BKZABdi46pxw3r6TYefCZBAimbahqjBITd3FEXLIv1QFrdIZBTmFPZCSAeOgXQO5xOoh4bOyZBxVFAZCxPZBaHaFXyasA7jix7CeRw5drfyX2UXwgw4PnoQ7XJ57MbZBSfxrQZDZD';
+         const webhookVerifyToken ='testCheck' ;
+
         
-        dbb.query(q,async (err, data) => {
-            if (err) {
-              console.log(err);
-              return res.json(err);
-            }
-            for (var i = 0; i < data.length; i++) {
-                console.log();
-           
-         
-        // replace the values below from the values you copied above
-        const from = process.env.PHONE_NUMBER_ID;
-        const token = process.env.ACCESS_TOKEN;
-        const to =  data[i].mobile_number;
-        const webhookVerifyToken =process.env.WEBHOOK_TOEKN ;
-    
+       
+
         const bot = createBot(from, token);
-    
+
         const result = await bot.sendText(to,message);
-    
+        const timestamp = Date.now();
+        const currentTimestamp = Math.floor(timestamp/1000);
+        const q = 'INSERT INTO message (from_number, to_number, message_text, conversation_id,send_datetime) VALUES (?,?,?,?,?)';
+        dbb.query(q,[from,to,message,conversation_id,currentTimestamp]);
+
         // Start express server to listen for incoming messages
         await bot.startExpressServer({
           webhookVerifyToken,
         });
+    
+        
+
+        // Listen to ALL incoming messages
+        bot.on('message', async (msg) => {
+          console.log(msg);
+    
+          if (msg.type === 'text') {
+            const q = 'INSERT INTO message (from_number, to_number, message_text,conversation_id,send_datetime) VALUES (?,?,?,?,?)';
+            dbb.query(q,[msg.from,from,msg.data.text,conversation_id,msg.timestamp]);
+          } else if (msg.type === 'image') {
+            await bot.sendText(msg.from, 'Received your image!');
+          }
+        });
+
+          res.status(200).json(result);
+      
+      } catch (err) {
+          res.status(500).json(err);
+      }
+    });
+
+router.post('/userAllMessage', (req,res)=>{
+      const conversation_id = req.body.conversation_id;
+      const q = 'SELECT * FROM message WHERE conversation_id = ?';
+      dbb.query(q,[conversation_id],async (err, data) => {
+          if (err) {
+            console.log(err);
+          }
+          res.status(200).json(data);
+      });
+  });
+
+router.post("/sendBulkMessage", async function (req,res){
+  const campaign_id = req.body.campaign_id;
+    let isError = false;
+      try {
+        const q = 'SELECT customers.mobile_number FROM customers INNER JOIN campaign_customers ON customers.id = campaign_customers.customer_id WHERE campaign_id = ?';
+        dbb.query(q,[campaign_id],async (err, data) => {
+            if (err && !isError) {
+              isError = true
+              console.log(err);
+              return res.json(err);
+            }
+            for (var i = 0; i < data.length; i++) {
+           
+         console.log(data[i].mobile_number);
+        // replace the values below from the values you copied above
+        const from = 108705542121394;
+        const token = 'EAAM5CTpl8JgBAOA7hVHMmcLbkIEdiRZAZCrLSJAWZB3HrZCEaWMZAxC8UZAB6ZA87kPS1XvR33XLRTX2BKZABdi46pxw3r6TYefCZBAimbahqjBITd3FEXLIv1QFrdIZBTmFPZCSAeOgXQO5xOoh4bOyZBxVFAZCxPZBaHaFXyasA7jix7CeRw5drfyX2UXwgw4PnoQ7XJ57MbZBSfxrQZDZD';
+        const to =  `91${data[i].mobile_number}`;
+        const webhookVerifyToken ='testCheck' ;
+        
+
+        
+        const bot = createBot(from, token);
+    
+        const result = await bot.sendTemplate(to,'hello_world', 'en_us');
+    
+        if(i == 0){
+          // Start express server to listen for incoming messages
+          await bot.startExpressServer({
+            webhookVerifyToken,
+          });
+        }
     
         // Listen to ALL incoming messages
         bot.on('message', async (msg) => {
@@ -130,11 +192,16 @@ router.post("/sendMessage", async function (req,res){
             await bot.sendText(msg.from, 'Received your image!');
           }
         });
-    }
-        res.status(200).json(result);
+        
+            }
+            res.status(200).json("done");
+      
     });
       } catch (err) {
-        res.status(500).json("err");
+        if(!isError){
+          res.status(500).json("err");
+          isError = true;
+        }
       }
   });
 

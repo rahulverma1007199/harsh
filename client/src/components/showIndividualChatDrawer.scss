@@ -1,0 +1,14 @@
+#chatButton{
+    background-color:white;
+    width:100px;
+    height:30px;
+    &:hover{
+        background-color:white;
+    }
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    span{
+        color:black;
+    }
+}

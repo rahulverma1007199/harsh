@@ -12,8 +12,7 @@ import { URL, CUSTOMERDELETEURL } from "../../../api/constants";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from "react-router-dom";
-import { Button } from 'antd';
-import ChatDrawer from "../../../components/ChatDrawer";
+import ShowIndividualChatDrawer from "../../../components/ShowIndividualChatDrawer.jsx";
 
 export default function CustomersTable() {
   const [page, setPage] = React.useState(0);
@@ -31,19 +30,17 @@ export default function CustomersTable() {
   };
 
   const token = localStorage.getItem("token");
-  console.log(token)
 
   useEffect(() => {
     axios.get(`${URL}customerList`,
       {
         headers: { "Authorization": `Bearer ${token}` }
       }).then(res => {
-        console.log(res)
         setData(res.data.Message)
       }).catch(err => {
         console.log(err)
       })
-  }, [])
+  }, [token])
 
   const deleteFun = (id) => {
     axios({
@@ -63,16 +60,6 @@ export default function CustomersTable() {
   const editFun = (id) => {
     navigate("/admin/customer-details/" + id)
   }
-
-  const [drawerVisible, setDrawerVisible] = useState(false);
-
-  const showDrawer = () => {
-  setDrawerVisible(true);
-  };
-
-  const hideDrawer = () => {
-  setDrawerVisible(false);
-  };
 
   return (
     <>
@@ -101,7 +88,7 @@ export default function CustomersTable() {
             </TableHead>
             <TableBody>
               {data.map((item, index) => (
-                <TableRow>
+                <TableRow key={item.id}>
                   <TableCell>{index + 1}</TableCell>
                   <TableCell>{item.first_name}</TableCell>
                   <TableCell>{item.mobile_number}</TableCell>
@@ -110,12 +97,7 @@ export default function CustomersTable() {
                   <TableCell>{item.districtref?.district}</TableCell>
                   <TableCell>{item.tehsilref?.tahshil}</TableCell>
                   <TableCell>
-                    <div>
-                      <Button type="primary" onClick={showDrawer}>
-                        Open chat
-                      </Button>
-                      <ChatDrawer visible={drawerVisible} onClose={hideDrawer} />
-                    </div>
+                      <ShowIndividualChatDrawer name={item.first_name} number={item.mobile_number} id={item.id}/>
                   </TableCell>
                   <TableCell>
                     <div><button><EditIcon onClick={() => editFun(item.id)} /> </button><button><DeleteIcon onClick={() => deleteFun(item.id)} /></button></div>

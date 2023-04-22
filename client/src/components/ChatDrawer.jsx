@@ -7,25 +7,25 @@ import vCam from '../img/vCamera.png';
 import menu from '../img/menu.png';
 import addFr from '../img/addFriend.png';
 
-const ChatDrawer = ({ visible, onClose }) => {
+const ChatDrawer = ({ visible, onClose, name, number,id}) => {
   return (
     <Drawer
-      visible={visible}
+      open={visible}
       onClose={onClose}
       title="Chat"
       width={400}
     >
     <div className="chat">
     <div className="chatInfo">
-        <span>Jane</span>
+        <span>{name}</span>
         <div className="chatIcons">
           <img src={vCam} alt="" />
           <img src={addFr} alt="" />
           <img src={menu} alt="" />
         </div>
       </div>
-      <Messages/> 
-      <Input/>
+      <Messages number={number} id={id}/> 
+      <Input number={number} id={id}/>
     </div>
     </Drawer>
   );
